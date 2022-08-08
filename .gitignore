@@ -1,0 +1,5 @@
+library/movies/*
+library/tvshows/*
+downloads/complete/*
+downloads/incomplete/*
+!.gitkeep
