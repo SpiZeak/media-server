@@ -7,12 +7,12 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Stockholm
-      - JELLYFIN_PublishedServerUrl=192.168.50.63 #optional
+      - JELLYFIN_PublishedServerUrl=${DOCKER_GATEWAY_HOST:-host.docker.internal} #optional
     volumes:
       - ./library/tvshows:/data/tvshows
       - ./library/movies:/data/movies
     ports:
-      - 8096:8096
+      - 80:8096
       - 8920:8920 #optional
       - 7359:7359/udp #optional
       - 1900:1900/udp #optional
