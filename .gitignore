@@ -1,5 +1,10 @@
+config/*
+vpn/*
 library/movies/*
 library/tvshows/*
-downloads/complete/*
+downloads/completed/*
 downloads/incomplete/*
+downloads/transmission-home
+
 !.gitkeep
+.env
