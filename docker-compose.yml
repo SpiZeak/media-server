@@ -37,6 +37,7 @@ services:
       - OPENVPN_USERNAME=${OPENVPN_USERNAME}
       - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
       - LOCAL_NETWORK=192.168.0.0/16
+      - TRANSMISSION_SCRAPE_PAUSED_TORRENTS_ENABLED=false
     cap_add:
       - NET_ADMIN
     volumes:
@@ -44,8 +45,6 @@ services:
       - ./downloads:/downloads
     ports:
       - 9091:9091
-      - 51413:51413
-      - 51413:51413/udp
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
     restart: unless-stopped
@@ -109,6 +108,19 @@ services:
     ports:
       - 6767:6767
     restart: unless-stopped
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./portainer-data:/data
+    ports:
+      - 9000:9000
 
   watchtower:
     container_name: watchtower

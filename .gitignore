@@ -1,5 +1,6 @@
 config/*
 vpn/*
+portainer-data/*
 library/movies/*
 library/tvshows/*
 downloads/completed/*
