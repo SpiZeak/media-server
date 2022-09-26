@@ -8,6 +8,11 @@ The Transmission client is using [Mullvad](https://mullvad.net/) as a VPN provid
     - *OPENVPN_USERNAME*
     - *OPENVPN_PASSWORD*
 - `docker compose up -d`
-- Visit [localhost](http://localhost)
-- ???
-- Profit.
+- The following services should now be accessible from your browser:
+    - *Jellyfin* - localhost:80
+    - *transmission* - localhost:9091
+    - *radarr* - localhost:7878
+    - *sonarr* - localhost:8989
+    - *jacett* - localhost:9117
+    - *bazarr* - localhost:6767
+    - *portainer* - localhost:9000
