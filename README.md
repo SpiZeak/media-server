@@ -3,6 +3,6 @@ The Transmission client is using [Mullvad](https://mullvad.net/) as a VPN provid
 
 ## Instructions
 - `docker compose up -d`
-- Visit [localhost]http://localhost
+- Visit [localhost](http://localhost)
 - ???
 - Profit.
