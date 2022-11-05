@@ -6,6 +6,6 @@ library/tvshows/*
 downloads/completed/*
 downloads/incomplete/*
 downloads/transmission-home
-
-!.gitkeep
 .env
+
+!/**/.gitkeep
