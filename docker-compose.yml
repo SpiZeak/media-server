@@ -1,8 +1,10 @@
 version: "2.1"
 services:
   jellyfin:
-    image: linuxserver/jellyfin:latest
+    build: ./config/jellyfin
     container_name: jellyfin
+    group_add:
+      - video
     environment:
       - PUID=1000
       - PGID=1000
@@ -38,6 +40,10 @@ services:
       - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
       - LOCAL_NETWORK=192.168.0.0/16
       - TRANSMISSION_SCRAPE_PAUSED_TORRENTS_ENABLED=false
+      - TRANSMISSION_RPC_AUTHENTICATION_REQUIRED=true
+      - TRANSMISSION_RPC_USERNAME=$TRANSMISSION_RPC_USERNAME
+      - TRANSMISSION_RPC_PASSWORD=$TRANSMISSION_RPC_PASSWORD
+      - TRANSMISSION_PORT_FORWARDING_ENABLED=true
     cap_add:
       - NET_ADMIN
     volumes:
@@ -65,7 +71,7 @@ services:
     restart: unless-stopped
 
   sonarr:
-    image: linuxserver/sonarr:latest
+    image: linuxserver/sonarr:develop
     container_name: sonarr
     environment:
       - PUID=1000
@@ -115,17 +121,8 @@ services:
     command: --interval 21600
     restart: unless-stopped
 
-  proxy:
-    container_name: proxy
-    image: nginx
-    ports:
-      - 8080:8080
-    volumes:
-      - ./config/proxy/nginx.conf:/etc/nginx/nginx.conf
-    restart: unless-stopped
-
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:develop
+    image: linuxserver/prowlarr:develop
     container_name: prowlarr
     environment:
       - PUID=1000
@@ -138,7 +135,7 @@ services:
     restart: unless-stopped
 
   flaresolverr:
-    image: ngosang/flaresolverr:3.0.0.beta3
+    image: flaresolverr/flaresolverr
     container_name: flaresolverr
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
