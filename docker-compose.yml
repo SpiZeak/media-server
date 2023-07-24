@@ -15,10 +15,7 @@ services:
       - ./library/tvshows:/data/tvshows
       - ./library/movies:/data/movies
     ports:
-      - 80:8096
-      - 8920:8920 #optional
-      - 7359:7359/udp #optional
-      - 1900:1900/udp #optional
+      - "8096:8096"
     devices:
       - /dev/video0
       - /dev/video1
@@ -49,8 +46,8 @@ services:
     volumes:
       - ./config/transmission/vpn:/etc/openvpn/custom
       - ./downloads:/downloads
-    ports:
-      - 9091:9091
+    expose:
+      - 9091
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
     restart: unless-stopped
@@ -66,8 +63,8 @@ services:
       - ./config/radarr:/config
       - ./library/movies:/movies
       - ./downloads:/data
-    ports:
-      - 7878:7878
+    expose:
+      - 7878
     restart: unless-stopped
 
   sonarr:
@@ -81,8 +78,8 @@ services:
       - ./config/sonarr:/config
       - ./library/tvshows:/tv
       - ./downloads:/data
-    ports:
-      - 8989:8989
+    expose:
+      - 8989
     restart: unless-stopped
 
   bazarr:
@@ -96,22 +93,9 @@ services:
       - ./config/bazarr:/config
       - ./library/movies:/movies
       - ./library/tvshows:/tv
-    ports:
-      - 6767:6767
+    expose:
+      - 6767
     restart: unless-stopped
-
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./config/portainer:/data
-    ports:
-      - 9000:9000
 
   watchtower:
     container_name: watchtower
@@ -121,14 +105,28 @@ services:
     command: --interval 21600
     restart: unless-stopped
 
-  proxy:
-    container_name: proxy
-    image: nginx
+  nginx:
+    container_name: nginx
+    build: ./config/nginx
     ports:
-      - 8080:8080
+      - "80:80"
+      - "443:443/tcp"
+      - "443:443/udp"
     volumes:
-      - ./config/proxy/nginx.conf:/etc/nginx/nginx.conf
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./config/nginx/conf/:/etc/nginx/conf.d/:ro
+      - ./config/certbot/www:/var/www/certbot/:ro
+      - ./config/certbot/conf:/etc/letsencrypt:ro
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     restart: unless-stopped
+
+  certbot:
+    container_name: certbot
+    image: certbot/certbot:latest
+    volumes:
+      - ./config/certbot/conf:/etc/letsencrypt:rw
+      - ./config/certbot/www/:/var/www/certbot/:rw
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
   prowlarr:
     image: linuxserver/prowlarr:develop
@@ -139,8 +137,8 @@ services:
       - TZ=Europe/Stockholm
     volumes:
       - ./config/prowlarr:/config
-    ports:
-      - 9696:9696
+    expose:
+      - 9696
     restart: unless-stopped
 
   flaresolverr:
@@ -151,8 +149,8 @@ services:
       - LOG_HTML=${LOG_HTML:-false}
       - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
       - TZ=Europe/Stockholm
-    ports:
-      - "${PORT:-8191}:8191"
+    expose:
+      - 8191
     restart: unless-stopped
 
   cross-seed:
