@@ -8,11 +8,12 @@ config/nginx/conf/*.trewhitt.se.conf
 config/prowlarr/*
 config/radarr/*
 config/sonarr/*
+config/transmission/*
 config/transmission/vpn/*
+!config/transmission/transmission-home/AddTransmissionTrackers.sh
 portainer-data/*
 library/movies/*
 library/tvshows/*
 downloads/*
-!downloads/transmission-home/AddTransmissionTrackers.sh
 .env
 !/**/.gitkeep
