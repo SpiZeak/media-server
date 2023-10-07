@@ -1,5 +1,5 @@
 ## Notes
-The Transmission client is using [Mullvad](https://mullvad.net/) as a VPN provider, feel free to fork this repo and change it.
+The Transmission client is using [PIA](https://www.privateinternetaccess.com) as a VPN provider, feel free to fork this repo.
 
 ## Instructions
 - Create a .env file with the following variables:
