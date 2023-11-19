@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
 
   transmission:
-    image: haugene/transmission-openvpn:dev
+    image: haugene/transmission-openvpn:master
     container_name: transmission
     environment:
       - PUID=1000
@@ -44,8 +44,8 @@ services:
     cap_add:
       - NET_ADMIN
     volumes:
-      - ./config/transmission/vpn:/etc/openvpn/custom
-      - ./downloads:/downloads
+      - ./config/transmission:/config
+      - ./downloads:/data
     expose:
       - 9091
     sysctls:
@@ -66,6 +66,20 @@ services:
     expose:
       - 7878
     restart: unless-stopped
+
+  unpackerr:
+    image: golift/unpackerr
+    container_name: unpackerr
+    volumes:
+      - ./downloads:/downloads
+    restart: unless-stopped
+    user: 1000:1000
+    environment:
+      - TZ=Europe/Stockholm
+      - UN_SONARR_0_URL=http://sonarr:8989
+      - UN_SONARR_0_API_KEY=${SONARR_API_KEY}
+      - UN_RADARR_0_URL=http://radarr:7878
+      - UN_RADARR_0_API_KEY=${RADARR_API_KEY}
 
   sonarr:
     image: linuxserver/sonarr:develop
@@ -120,6 +134,13 @@ services:
       - ./config/certbot/conf:/etc/letsencrypt:ro
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     restart: unless-stopped
+    depends_on:
+      - jellyfin
+      - radarr
+      - sonarr
+      - bazarr
+      - transmission
+      - prowlarr
 
   certbot:
     container_name: certbot
