@@ -71,7 +71,7 @@ services:
     image: golift/unpackerr
     container_name: unpackerr
     volumes:
-      - ./downloads:/downloads
+      - ./downloads/completed:/downloads
     restart: unless-stopped
     user: 1000:1000
     environment:
