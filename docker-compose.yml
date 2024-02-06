@@ -5,6 +5,8 @@ services:
     container_name: jellyfin
     group_add:
       - video
+    mem_limit: 1024M
+    mem_reservation: 128M
     environment:
       - PUID=1000
       - PGID=1000
