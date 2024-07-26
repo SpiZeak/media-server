@@ -1,12 +1,9 @@
-version: "2.1"
 services:
   jellyfin:
-    build: ./config/jellyfin
+    image: lscr.io/linuxserver/jellyfin:nightly
     container_name: jellyfin
     group_add:
       - video
-    mem_limit: 1024M
-    mem_reservation: 128M
     environment:
       - PUID=1000
       - PGID=1000
@@ -16,14 +13,13 @@ services:
       - ./config/jellyfin:/config
       - ./library/tvshows:/data/tvshows
       - ./library/movies:/data/movies
-    ports:
-      - "8096:8096"
+    privileged: true
     devices:
-      - /dev/video0
-      - /dev/video1
-      - /dev/video2
-      - /dev/video3
-      - /dev/video4
+      - /dev/dri
+      - /dev/dma_heap
+      - /dev/mali0
+      - /dev/rga
+      - /dev/mpp_service
     restart: unless-stopped
 
   transmission:
@@ -48,6 +44,8 @@ services:
     volumes:
       - ./config/transmission:/config
       - ./downloads:/data
+      - ./config/transmission/transmission-home:/data/transmission-home
+      - ./incomplete:/data/incomplete
     expose:
       - 9091
     sysctls:
@@ -65,6 +63,7 @@ services:
       - ./config/radarr:/config
       - ./library/movies:/movies
       - ./downloads:/data
+      - ./config/transmission/transmission-home:/data/transmission-home
     expose:
       - 7878
     restart: unless-stopped
@@ -94,6 +93,7 @@ services:
       - ./config/sonarr:/config
       - ./library/tvshows:/tv
       - ./downloads:/data
+      - ./config/transmission/transmission-home:/data/transmission-home
     expose:
       - 8989
     restart: unless-stopped
@@ -132,6 +132,7 @@ services:
       - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./config/nginx/conf.d/:/etc/nginx/conf.d/:ro
       - ./config/nginx/sites-enabled/:/etc/nginx/sites-enabled/:ro
+      - ./config/nginx/cache:/var/cache/nginx:rw
       - ./config/certbot/www:/var/www/certbot/:ro
       - ./config/certbot/conf:/etc/letsencrypt:ro
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
@@ -144,13 +145,14 @@ services:
       - transmission
       - prowlarr
 
+  # docker compose run certbot certonly -d max.trewhitt.au --manual --preferred-challenges dns
   certbot:
     container_name: certbot
     image: certbot/certbot:latest
     volumes:
       - ./config/certbot/conf:/etc/letsencrypt:rw
       - ./config/certbot/www/:/var/www/certbot/:rw
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    # entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
   prowlarr:
     image: linuxserver/prowlarr:develop

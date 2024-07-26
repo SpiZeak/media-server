@@ -7,15 +7,15 @@ RUN apt update && \
 
 RUN apt install -y libpcre3 libpcre3-dev zlib1g zlib1g-dev openssl libssl-dev wget git gcc make libbrotli-dev
 
-RUN wget https://nginx.org/download/nginx-1.25.3.tar.gz && tar -zxf nginx-1.25.3.tar.gz
+RUN wget https://nginx.org/download/nginx-1.27.0.tar.gz && tar -zxf nginx-1.27.0.tar.gz
 
 RUN git clone --recurse-submodules -j8 https://github.com/google/ngx_brotli.git
 
 RUN rm -rf /etc/nginx
 
-RUN cd nginx-1.25.3 && ./configure \
+RUN cd nginx-1.27.0 && ./configure \
 	--add-dynamic-module=../ngx_brotli \
-	--with-cc-opt='-g -O2 -ffile-prefix-map=/build/nginx-quic-fF80uJ/nginx-quic-1.25.3=. -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fPIC -Wdate-time -D_FORTIFY_SOURCE=2' \
+	--with-cc-opt='-g -O2 -ffile-prefix-map=/build/nginx-quic-fF80uJ/nginx-quic-1.27.0=. -flto=auto -ffat-lto-objects -flto=auto -ffat-lto-objects -fstack-protector-strong -Wformat -Werror=format-security -fPIC -Wdate-time -D_FORTIFY_SOURCE=2' \
 	--with-ld-opt='-Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -Wl,-z,now -fPIC' \
 	--with-ld-opt='/usr/lib/aarch64-linux-gnu/libssl.a /usr/lib/aarch64-linux-gnu/libcrypto.a' \
 	--prefix=/usr/share/nginx \
