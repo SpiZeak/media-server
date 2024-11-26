@@ -13,6 +13,7 @@ services:
       - ./config/jellyfin:/config
       - ./library/tvshows:/data/tvshows
       - ./library/movies:/data/movies
+      - /usr/local/lib:/usr/local/lib
     privileged: true
     devices:
       - /dev/dri
@@ -20,10 +21,12 @@ services:
       - /dev/mali0
       - /dev/rga
       - /dev/mpp_service
+      - /video-dec1
+      - /video-dec3
     restart: unless-stopped
 
   transmission:
-    image: haugene/transmission-openvpn:master
+    image: haugene/transmission-openvpn:dev
     container_name: transmission
     environment:
       - PUID=1000
@@ -69,7 +72,7 @@ services:
     restart: unless-stopped
 
   unpackerr:
-    image: golift/unpackerr
+    image: golift/unpackerr:unstable
     container_name: unpackerr
     volumes:
       - ./downloads/completed:/downloads
@@ -115,7 +118,7 @@ services:
 
   watchtower:
     container_name: watchtower
-    image: containrrr/watchtower:latest
+    image: containrrr/watchtower:latest-dev
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 21600
@@ -148,11 +151,11 @@ services:
   # docker compose run certbot certonly -d max.trewhitt.au --manual --preferred-challenges dns
   certbot:
     container_name: certbot
-    image: certbot/certbot:latest
+    image: certbot/certbot:nightly
     volumes:
       - ./config/certbot/conf:/etc/letsencrypt:rw
       - ./config/certbot/www/:/var/www/certbot/:rw
-    # entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
   prowlarr:
     image: linuxserver/prowlarr:develop
@@ -179,15 +182,15 @@ services:
       - 8191
     restart: unless-stopped
 
-  cross-seed:
-    image: crossseed/cross-seed
-    container_name: cross-seed
-    user: 1000:1000
-    volumes:
-      - ./config/cross-seed:/config
-      - ./downloads/transmission-home/torrents:/torrents:ro
-      - ./downloads/completed/:/cross-seeds:ro
-    command: search
+#  cross-seed:
+#    image: crossseed/cross-seed
+#    container_name: cross-seed
+#    user: 1000:1000
+#    volumes:
+#      - ./config/cross-seed:/config
+#      - ./downloads/transmission-home/torrents:/torrents:ro
+#      - ./downloads/completed/:/cross-seeds:ro
+#    command: search
 
   cloudflare-ddns:
     image: oznu/cloudflare-ddns:latest
