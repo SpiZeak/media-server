@@ -26,7 +26,7 @@ services:
     restart: unless-stopped
 
   transmission:
-    image: haugene/transmission-openvpn:dev
+    image: haugene/transmission-openvpn:latest
     container_name: transmission
     environment:
       - PUID=1000
@@ -42,8 +42,11 @@ services:
       - TRANSMISSION_RPC_USERNAME=$TRANSMISSION_RPC_USERNAME
       - TRANSMISSION_RPC_PASSWORD=$TRANSMISSION_RPC_PASSWORD
       - TRANSMISSION_PORT_FORWARDING_ENABLED=true
+#      - CREATE_TUN_DEVICE=true
     cap_add:
       - NET_ADMIN
+    devices:
+      - /dev/net/tun
     volumes:
       - ./config/transmission:/config
       - ./downloads:/data
@@ -114,14 +117,6 @@ services:
       - ./library/tvshows:/tv
     expose:
       - 6767
-    restart: unless-stopped
-
-  watchtower:
-    container_name: watchtower
-    image: containrrr/watchtower:latest-dev
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 21600
     restart: unless-stopped
 
   nginx:
